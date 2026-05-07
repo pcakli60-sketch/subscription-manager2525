@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SubsPRO — إدارة الاشتراكات</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #0a0e1a;
+  --surface: #111827;
+  --surface2: #1a2235;
+  --surface3: #1f2d42;
+  --border: rgba(99,179,255,0.12);
+  --accent: #3b9eff;
+  --accent2: #00d4aa;
+  --accent3: #ff6b6b;
+  --accent4: #ffc542;
+  --text: #e8f0fe;
+  --text2: #8fa8c8;
+  --text3: #4d6480;
+  --success: #00c97a;
+  --warning: #ffaa00;
+  --danger: #ff4d4d;
+  --request: #a78bfa;
+  --glow: 0 0 20px rgba(59,158,255,0.25);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Cairo', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 10% 10%, rgba(59,158,255,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 90% 80%, rgba(0,212,170,0.06) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ====== LOGIN ====== */
+#loginBox {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  z-index: 999;
+}
+
+.login-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.6), var(--glow);
+  position: relative;
+  overflow: hidden;
+}
+
+.login-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+}
+
+.login-logo {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.login-logo .brand {
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: -1px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.login-logo .sub {
+  font-size: 13px;
+  color: var(--text3);
+  margin-top: 4px;
+}
+
+.field {
+  margin-bottom: 16px;
+}
+
+.field label {
+  display: block;
+  font-size: 12px;
+  color: var(--text2);
+  margin-bottom: 6px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.field input, .field select {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: 'Cairo', sans-serif;
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+.field input:focus, .field select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59,158,255,0.12);
+}
+
+.field select option {
+  background: var(--surface2);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), #1e7ae0);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(59,158,255,0.3);
+  width: 100%;
+  justify-content: center;
+  padding: 14px;
+  font-size: 15px;
+}
+
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(59,158,255,0.4); }
+
+.btn-success { background: rgba(0,201,122,0.15); color: var(--success); border: 1px solid rgba(0,201,122,0.3); }
+.btn-success:hover { background: rgba(0,201,122,0.25); }
+
+.btn-warning { background: rgba(255,170,0,0.15); color: var(--warning); border: 1px solid rgba(255,170,0,0.3); }
+.btn-warning:hover { background: rgba(255,170,0,0.25); }
+
+.btn-danger { background: rgba(255,77,77,0.15); color: var(--danger); border: 1px solid rgba(255,77,77,0.3); }
+.btn-danger:hover { background: rgba(255,77,77,0.25); }
+
+.btn-accent { background: rgba(59,158,255,0.15); color: var(--accent); border: 1px solid rgba(59,158,255,0.3); }
+.btn-accent:hover { background: rgba(59,158,255,0.25); }
+
+.btn-ghost { background: transparent; color: var(--text2); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--surface2); color: var(--text); }
+
+.btn-purple { background: rgba(167,139,250,0.15); color: var(--request); border: 1px solid rgba(167,139,250,0.3); }
+.btn-purple:hover { background: rgba(167,139,250,0.25); }
+
+/* ====== APP ====== */
+#app { position: relative; z-index: 1; }
+
+/* TOPBAR */
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+}
+
+.topbar-brand {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -1px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.topbar-right { display: flex; gap: 10px; align-items: center; }
+
+/* MAIN LAYOUT */
+.main-wrap {
+  padding: 24px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* STATS */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+
+.stat-card:hover { transform: translateY(-2px); }
+
+.stat-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+}
+
+.stat-card.total::after { background: var(--accent); }
+.stat-card.active::after { background: var(--success); }
+.stat-card.expired::after { background: var(--danger); }
+.stat-card.unpaid::after { background: var(--warning); }
+
+.stat-icon { font-size: 24px; margin-bottom: 12px; }
+.stat-val {
+  font-size: 36px;
+  font-weight: 900;
+  font-family: 'IBM Plex Mono', monospace;
+  line-height: 1;
+}
+
+.stat-card.total .stat-val { color: var(--accent); }
+.stat-card.active .stat-val { color: var(--success); }
+.stat-card.expired .stat-val { color: var(--danger); }
+.stat-card.unpaid .stat-val { color: var(--warning); }
+
+.stat-label { font-size: 13px; color: var(--text2); margin-top: 6px; font-weight: 600; }
+
+/* CONTROLS */
+.controls-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 220px;
+}
+
+.search-wrap .search-icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text3);
+  font-size: 16px;
+}
+
+.search-wrap input {
+  width: 100%;
+  padding: 11px 42px 11px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: 'Cairo', sans-serif;
+  font-size: 14px;
+  transition: border-color 0.2s;
+  outline: none;
+}
+
+.search-wrap input:focus { border-color: var(--accent); }
+
+.filter-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.filter-tab {
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text2);
+  transition: all 0.2s;
+}
+
+.filter-tab:hover { color: var(--text); background: var(--surface2); }
+.filter-tab.active { border-color: var(--accent); background: rgba(59,158,255,0.12); color: var(--accent); }
+.filter-tab.active.f-active { border-color: var(--success); background: rgba(0,201,122,0.12); color: var(--success); }
+.filter-tab.active.f-expired { border-color: var(--danger); background: rgba(255,77,77,0.12); color: var(--danger); }
+.filter-tab.active.f-unpaid { border-color: var(--warning); background: rgba(255,170,0,0.12); color: var(--warning); }
+.filter-tab.active.f-request { border-color: var(--request); background: rgba(167,139,250,0.12); color: var(--request); }
+
+/* ADD FORM */
+.add-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 0;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.add-panel-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}
+
+.add-panel-header h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.add-panel-header .toggle-icon {
+  color: var(--text3);
+  transition: transform 0.3s;
+  font-size: 12px;
+}
+
+.add-panel-header.open .toggle-icon { transform: rotate(180deg); }
+
+.add-panel-body {
+  padding: 24px;
+  display: none;
+}
+
+.add-panel-body.open { display: block; }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+/* TABLE */
+.table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.table-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.table-header h3 { font-size: 15px; font-weight: 700; }
+
+.table-scroll { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1100px;
+}
+
+thead tr {
+  background: var(--surface2);
+}
+
+thead th {
+  padding: 12px 14px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text2);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+tbody tr {
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background 0.15s;
+}
+
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: rgba(255,255,255,0.03); }
+
+tbody tr.row-ok { }
+tbody tr.row-warn { background: rgba(255,170,0,0.05); }
+tbody tr.row-expired { background: rgba(255,77,77,0.05); }
+tbody tr.row-unpaid { background: rgba(255,165,0,0.04); }
+tbody tr.row-request { background: rgba(167,139,250,0.06); }
+
+td {
+  padding: 12px 14px;
+  text-align: center;
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+.num-cell {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--text3);
+}
+
+.name-cell { font-weight: 700; color: var(--text); }
+
+.mono {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: var(--text2);
+}
+
+.service-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.badge-netflix { background: rgba(229,9,20,0.15); color: #ff4545; border: 1px solid rgba(229,9,20,0.25); }
+.badge-shahid { background: rgba(255,122,0,0.15); color: #ff9500; border: 1px solid rgba(255,122,0,0.25); }
+.badge-iptv { background: rgba(59,158,255,0.15); color: var(--accent); border: 1px solid rgba(59,158,255,0.25); }
+.badge-disney { background: rgba(59,102,255,0.15); color: #6e8bff; border: 1px solid rgba(59,102,255,0.25); }
+.badge-prime { background: rgba(0,168,225,0.15); color: #00c8ff; border: 1px solid rgba(0,168,225,0.25); }
+.badge-osn { background: rgba(0,212,170,0.15); color: var(--accent2); border: 1px solid rgba(0,212,170,0.25); }
+.badge-chatgpt { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.25); }
+.badge-youtube { background: rgba(255,0,0,0.15); color: #ff5555; border: 1px solid rgba(255,0,0,0.25); }
+.badge-crunchyroll { background: rgba(255,100,0,0.15); color: #ff6b00; border: 1px solid rgba(255,100,0,0.25); }
+.badge-canva { background: rgba(0,194,170,0.15); color: #00c2aa; border: 1px solid rgba(0,194,170,0.25); }
+.badge-capcut { background: rgba(150,150,150,0.15); color: #aaa; border: 1px solid rgba(150,150,150,0.25); }
+.badge-default { background: rgba(130,130,180,0.15); color: #9898cc; border: 1px solid rgba(130,130,180,0.25); }
+
+.days-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'IBM Plex Mono', monospace;
+  min-width: 68px;
+}
+
+.days-ok { background: rgba(0,201,122,0.12); color: var(--success); border: 1px solid rgba(0,201,122,0.25); }
+.days-warn { background: rgba(255,170,0,0.12); color: var(--warning); border: 1px solid rgba(255,170,0,0.25); }
+.days-expired { background: rgba(255,77,77,0.12); color: var(--danger); border: 1px solid rgba(255,77,77,0.25); }
+.days-request { background: rgba(167,139,250,0.12); color: var(--request); border: 1px solid rgba(167,139,250,0.25); }
+
+.paid-check {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+}
+
+.paid-check input { opacity: 0; width: 0; height: 0; }
+
+.paid-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: rgba(255,255,255,0.08);
+  border-radius: 20px;
+  transition: 0.2s;
+  border: 1px solid var(--border);
+}
+
+.paid-slider:before {
+  content: '';
+  position: absolute;
+  width: 14px; height: 14px;
+  left: 2px; bottom: 2px;
+  background: var(--text3);
+  border-radius: 50%;
+  transition: 0.2s;
+}
+
+.paid-check input:checked + .paid-slider { background: rgba(0,201,122,0.2); border-color: rgba(0,201,122,0.4); }
+.paid-check input:checked + .paid-slider:before { transform: translateX(16px); background: var(--success); }
+
+.actions { display: flex; gap: 4px; justify-content: center; flex-wrap: wrap; }
+
+.actions .btn { padding: 6px 10px; font-size: 13px; }
+
+.request-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: rgba(167,139,250,0.12);
+  border: 1px solid rgba(167,139,250,0.25);
+  border-radius: 12px;
+  font-size: 11px;
+  color: var(--request);
+  font-weight: 700;
+}
+
+.price-val {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent4);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 24px;
+  color: var(--text3);
+}
+
+.empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-state p { font-size: 14px; }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 32px;
+  width: 100%;
+  max-width: 600px;
+  position: relative;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal h3 {
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 24px;
+  color: var(--text);
+}
+
+.modal-close {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 32px; height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text2);
+  font-size: 16px;
+  transition: all 0.2s;
+}
+
+.modal-close:hover { background: var(--surface3); color: var(--text); }
+
+.modal-footer {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+  justify-content: flex-end;
+}
+
+/* TOAST */
+.toast-container {
+  position: fixed;
+  top: 80px;
+  right: 24px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.toast {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  animation: toastIn 0.3s ease;
+  max-width: 340px;
+}
+
+.toast.success { border-color: rgba(0,201,122,0.4); color: var(--success); }
+.toast.error { border-color: rgba(255,77,77,0.4); color: var(--danger); }
+.toast.info { border-color: rgba(59,158,255,0.4); color: var(--accent); }
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes toastOut {
+  to { opacity: 0; transform: translateX(20px); }
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .main-wrap { padding: 16px; }
+  .topbar { padding: 12px 16px; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="loginBox">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="brand">⚡ SubsPRO</div>
+      <div class="sub">نظام إدارة الاشتراكات الاحترافي</div>
+    </div>
+    <div class="field">
+      <label>البريد الإلكتروني</label>
+      <input id="loginEmail" type="email" placeholder="example@email.com">
+    </div>
+    <div class="field">
+      <label>كلمة المرور</label>
+      <input id="loginPass" type="password" placeholder="••••••••">
+    </div>
+    <button class="btn btn-primary" onclick="login()">🔐 تسجيل الدخول</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-brand">⚡ SubsPRO</div>
+    <div class="topbar-right">
+      <button class="btn btn-warning" onclick="sendAlerts()">🔔 التنبيهات</button>
+      <button class="btn btn-danger" onclick="logout()">خروج</button>
+    </div>
+  </div>
+
+  <div class="main-wrap">
+
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-card total">
+        <div class="stat-icon">📦</div>
+        <div class="stat-val" id="stTotal">0</div>
+        <div class="stat-label">إجمالي الاشتراكات</div>
+      </div>
+      <div class="stat-card active">
+        <div class="stat-icon">✅</div>
+        <div class="stat-val" id="stActive">0</div>
+        <div class="stat-label">اشتراكات نشطة</div>
+      </div>
+      <div class="stat-card expired">
+        <div class="stat-icon">⛔</div>
+        <div class="stat-val" id="stExpired">0</div>
+        <div class="stat-label">اشتراكات منتهية</div>
+      </div>
+      <div class="stat-card unpaid">
+        <div class="stat-icon">💳</div>
+        <div class="stat-val" id="stUnpaid">0</div>
+        <div class="stat-label">غير مدفوع</div>
+      </div>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="controls-bar">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input id="search" placeholder="بحث بالاسم، الهاتف، الخدمة..." onkeyup="onSearch(this.value)">
+      </div>
+      <div class="filter-tabs">
+        <button class="filter-tab active" data-filter="all" onclick="setFilter('all',this)">الكل</button>
+        <button class="filter-tab f-active" data-filter="active" onclick="setFilter('active',this)">🟢 نشط</button>
+        <button class="filter-tab f-expired" data-filter="expired" onclick="setFilter('expired',this)">🔴 منتهي</button>
+        <button class="filter-tab f-unpaid" data-filter="unpaid" onclick="setFilter('unpaid',this)">💳 غير مدفوع</button>
+        <button class="filter-tab f-request" data-filter="request" onclick="setFilter('request',this)">📋 الطلبات</button>
+      </div>
+    </div>
+
+    <!-- ADD FORM -->
+    <div class="add-panel">
+      <div class="add-panel-header" onclick="toggleAddPanel(this)">
+        <h3>➕ إضافة اشتراك جديد</h3>
+        <span class="toggle-icon">▼</span>
+      </div>
+      <div class="add-panel-body">
+        <div class="form-grid">
+          <div class="field">
+            <label>اسم الزبون *</label>
+            <input id="name" placeholder="محمد أحمد">
+          </div>
+          <div class="field">
+            <label>الهاتف *</label>
+            <input id="phone" placeholder="0XXXXXXXXX">
+          </div>
+          <div class="field">
+            <label>البريد الإلكتروني</label>
+            <input id="email" type="email" placeholder="email@example.com">
+          </div>
+          <div class="field">
+            <label>الملف الشخصي (Profil)</label>
+            <input id="profile" placeholder="Profile 1">
+          </div>
+          <div class="field">
+            <label>كلمة المرور (Password)</label>
+            <input id="password" placeholder="••••••••">
+          </div>
+          <div class="field">
+            <label>كود PIN</label>
+            <input id="pin" placeholder="1234">
+          </div>
+          <div class="field">
+            <label>الخدمة *</label>
+            <select id="product">
+              <option value="">اختر الخدمة</option>
+              <option>Netflix</option>
+              <option>Shahid</option>
+              <option>IPTV</option>
+              <option>Disney+</option>
+              <option>Prime Video</option>
+              <option>OSN+</option>
+              <option>ChatGPT</option>
+              <option>YouTube Premium</option>
+              <option>Crunchyroll</option>
+              <option>Canva Pro</option>
+              <option>CapCut Pro</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>السعر (DA)</label>
+            <input id="price" type="number" placeholder="500">
+          </div>
+          <div class="field">
+            <label>عدد الأيام (0 = طلب)</label>
+            <input id="days" type="number" placeholder="30">
+          </div>
+        </div>
+        <button class="btn btn-primary" style="width:auto;padding:12px 32px" onclick="addSub()">➕ إضافة الاشتراك</button>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-wrap">
+      <div class="table-header">
+        <h3>📋 قائمة الاشتراكات</h3>
+        <div style="font-size:13px;color:var(--text2)" id="rowCount"></div>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>الاسم</th>
+              <th>الهاتف</th>
+              <th>Email</th>
+              <th>Profil</th>
+              <th>Password</th>
+              <th>PIN</th>
+              <th>الخدمة</th>
+              <th>السعر</th>
+              <th>تاريخ الانتهاء</th>
+              <th>⏳ الأيام</th>
+              <th>مدفوع</th>
+              <th>إجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="list"></tbody>
+        </table>
+        <div id="emptyState" class="empty-state" style="display:none">
+          <div class="empty-icon">🔍</div>
+          <p>لا توجد نتائج مطابقة</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-close" onclick="closeModal()">✕</div>
+    <h3>✏️ تعديل الاشتراك</h3>
+    <input type="hidden" id="editId">
+    <div class="form-grid">
+      <div class="field">
+        <label>الاسم</label>
+        <input id="eName">
+      </div>
+      <div class="field">
+        <label>الهاتف</label>
+        <input id="ePhone">
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input id="eEmail">
+      </div>
+      <div class="field">
+        <label>Profil</label>
+        <input id="eProfile">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input id="ePassword">
+      </div>
+      <div class="field">
+        <label>PIN</label>
+        <input id="ePin">
+      </div>
+      <div class="field">
+        <label>السعر</label>
+        <input id="ePrice" type="number">
+      </div>
+      <div class="field">
+        <label>عدد الأيام من الآن</label>
+        <input id="eDays" type="number">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">إلغاء</button>
+      <button class="btn btn-primary" style="width:auto" onclick="saveEdit()">💾 حفظ التغييرات</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBTE_aaLCtUHt5MZq95k7uYCQ1vl7jTQvw",
+  authDomain: "systeme-des-abonnements-6a98c.firebaseapp.com",
+  projectId: "systeme-des-abonnements-6a98c",
+  storageBucket: "systeme-des-abonnements-6a98c.firebasestorage.app",
+  messagingSenderId: "74948745712",
+  appId: "1:74948745712:web:91eab4492f02bde4baa535"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const auth = firebase.auth();
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
+const $ = id => document.getElementById(id);
+
+let subs = [];
+let currentFilter = "all";
+let searchText = "";
+
+// ========== AUTH ==========
+function login() {
+  auth.signInWithEmailAndPassword($("loginEmail").value, $("loginPass").value)
+    .catch(e => showToast(e.message, 'error'));
+}
+
+function logout() { auth.signOut(); }
+
+auth.onAuthStateChanged(u => {
+  $("loginBox").style.display = u ? "none" : "flex";
+  $("app").style.display = u ? "block" : "none";
+  if (u) loadSubs();
+});
+
+// ========== DATA ==========
+function loadSubs() {
+  db.collection("subs").onSnapshot(snapshot => {
+    subs = [];
+    snapshot.forEach(doc => subs.push({ id: doc.id, ...doc.data() }));
+    render();
+  });
+}
+
+function getDateFromEnd(end) {
+  if (!end) return null;
+  if (end.seconds) return new Date(end.seconds * 1000);
+  return new Date(end);
+}
+
+function calcDays(end) {
+  let endDate = getDateFromEnd(end);
+  if (!endDate) return 0;
+  let today = new Date();
+  today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  endDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+  return Math.floor((endDate - today) / 86400000);
+}
+
+// ========== ADD ==========
+async function addSub() {
+  let days = parseInt($("days").value, 10);
+  if (!$("name").value || !$("phone").value || !$("product").value) {
+    showToast("يرجى ملء الحقول المطلوبة (الاسم، الهاتف، الخدمة)", 'error');
+    return;
+  }
+  let now = new Date();
+  let end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + (days || 0));
+
+  await db.collection("subs").add({
+    name: $("name").value,
+    phone: $("phone").value,
+    email: $("email").value || "",
+    profile: $("profile").value || "",
+    password: $("password").value || "",
+    pin: $("pin").value || "",
+    product: $("product").value,
+    price: $("price").value || "",
+    end: firebase.firestore.Timestamp.fromDate(end),
+    paid: false,
+    request: !days,
+    alert3Sent: false,
+    alertExpiredSent: false,
+    createdAt: firebase.firestore.Timestamp.now()
+  });
+
+  ["name","phone","email","profile","password","pin","product","price","days"]
+    .forEach(i => $(i).value = "");
+  showToast("✅ تمت إضافة الاشتراك بنجاح", 'success');
+}
+
+// ========== EDIT MODAL ==========
+function editSub(id) {
+  let s = subs.find(x => x.id === id);
+  $("editId").value = id;
+  $("eName").value = s.name || "";
+  $("ePhone").value = s.phone || "";
+  $("eEmail").value = s.email || "";
+  $("eProfile").value = s.profile || "";
+  $("ePassword").value = s.password || "";
+  $("ePin").value = s.pin || "";
+  $("ePrice").value = s.price || "";
+  $("eDays").value = "";
+  $("editModal").classList.add("open");
+}
+
+function closeModal() {
+  $("editModal").classList.remove("open");
+}
+
+async function saveEdit() {
+  let id = $("editId").value;
+  let days = parseInt($("eDays").value, 10);
+  let now = new Date();
+  let end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + (days || 0));
+
+  await db.collection("subs").doc(id).update({
+    name: $("eName").value,
+    phone: $("ePhone").value,
+    email: $("eEmail").value,
+    profile: $("eProfile").value,
+    password: $("ePassword").value,
+    pin: $("ePin").value,
+    price: $("ePrice").value,
+    end: firebase.firestore.Timestamp.fromDate(end),
+    request: false
+  });
+
+  closeModal();
+  showToast("✅ تم تحديث الاشتراك", 'success');
+}
+
+async function deleteSub(id) {
+  if (!confirm("هل تريد حذف هذا الاشتراك نهائياً؟")) return;
+  await db.collection("subs").doc(id).delete();
+  showToast("🗑 تم حذف الاشتراك", 'info');
+}
+
+async function togglePaid(id, val) {
+  await db.collection("subs").doc(id).update({ paid: val });
+}
+
+// ========== WHATSAPP ==========
+function formatPhone(phone) {
+  phone = phone.replace(/\D/g, "");
+  if (phone.startsWith("0")) phone = "213" + phone.substring(1);
+  return phone;
+}
+
+function sendWhatsApp(phone, name, product, endDate, days) {
+  if (!phone) return;
+  phone = formatPhone(phone);
+  let msg = days < 0
+    ? `مرحباً ${name} 👋\nاشتراك ${product} الخاص بك انتهى بتاريخ ${endDate}.\nيرجى التواصل معنا للتجديد. 🙏`
+    : `مرحباً ${name} 👋\nاشتراك ${product} الخاص بك سينتهي بتاريخ ${endDate} (متبقي ${days} أيام).\nتواصل معنا للتجديد المبكر. ✅`;
+  window.open("https://wa.me/" + phone + "?text=" + encodeURIComponent(msg), "_blank");
+}
+
+// ========== PDF ==========
+async function generatePDF(id) {
+  let s = subs.find(x => x.id === id);
+  const { jsPDF } = window.jspdf;
+  let doc = new jsPDF();
+
+  doc.setFillColor(17, 24, 39);
+  doc.rect(0, 0, 210, 297, 'F');
+
+  doc.setFontSize(22);
+  doc.setTextColor(59, 158, 255);
+  doc.text("FACTURE D'ABONNEMENT", 105, 28, null, null, "center");
+
+  doc.setFontSize(11);
+  doc.setTextColor(180, 200, 220);
+
+  let y = 55;
+  const line = (label, val) => {
+    doc.setTextColor(100, 140, 180);
+    doc.text(label, 20, y);
+    doc.setTextColor(220, 235, 255);
+    doc.text(String(val || "-"), 75, y);
+    y += 12;
+  };
+
+  doc.setFontSize(13);
+  doc.setTextColor(0, 212, 170);
+  doc.text("● Informations Client", 20, y); y += 10;
+
+  line("Nom :", s.name);
+  line("Téléphone :", s.phone);
+  line("Email :", s.email);
+  y += 6;
+
+  doc.setTextColor(59, 158, 255);
+  doc.text("● Détails Abonnement", 20, y); y += 10;
+
+  line("Service :", s.product);
+  line("Profil :", s.profile);
+  line("Password :", s.password);
+  line("PIN :", s.pin);
+  y += 6;
+
+  doc.setTextColor(255, 197, 66);
+  doc.text("● Facturation", 20, y); y += 10;
+
+  let endDate = getDateFromEnd(s.end);
+  let endText = endDate ? endDate.toLocaleDateString("fr-DZ") : "-";
+  let days = calcDays(s.end);
+
+  line("Date expiration :", endText);
+  line("Jours restants :", days < 0 ? "Expiré" : days + " jours");
+  line("Prix :", (s.price || "-") + " DA");
+  line("Statut paiement :", s.paid ? "✓ Payé" : "✗ Non payé");
+
+  doc.save("facture_" + s.name + ".pdf");
+  showToast("📄 تم إنشاء الفاتورة", 'success');
+}
+
+// ========== ALERTS ==========
+async function sendAlerts() {
+  let alerts = [];
+  for (let s of subs) {
+    let diff = calcDays(s.end);
+    if (diff === 3 && !s.alert3Sent) alerts.push({ type: "before", sub: s });
+    if (diff < 0 && !s.alertExpiredSent) alerts.push({ type: "expired", sub: s });
+  }
+
+  if (alerts.length === 0) {
+    showToast("لا توجد تنبيهات معلقة حالياً", 'info');
+    return;
+  }
+
+  showToast(`🔔 سيتم فتح ${alerts.length} محادثة واتساب`, 'info');
+
+  let i = 0;
+  function openNext() {
+    if (i >= alerts.length) { showToast("✅ تم إرسال جميع التنبيهات", 'success'); return; }
+    let item = alerts[i];
+    let s = item.sub;
+    let diff = calcDays(s.end);
+    let endDate = getDateFromEnd(s.end)?.toLocaleDateString("ar-DZ");
+    sendWhatsApp(s.phone, s.name, s.product, endDate, diff);
+    db.collection("subs").doc(s.id).update(
+      item.type === "before" ? { alert3Sent: true } : { alertExpiredSent: true }
+    );
+    i++;
+    setTimeout(openNext, 1200);
+  }
+  openNext();
+}
+
+// ========== RENDER ==========
+function onSearch(v) { searchText = v.toLowerCase(); render(); }
+
+function setFilter(f, el) {
+  currentFilter = f;
+  document.querySelectorAll(".filter-tab").forEach(t => t.classList.remove("active"));
+  if (el) el.classList.add("active");
+  render();
+}
+
+function getServiceBadgeClass(product) {
+  const map = {
+    "Netflix": "badge-netflix",
+    "Shahid": "badge-shahid",
+    "IPTV": "badge-iptv",
+    "Disney+": "badge-disney",
+    "Prime Video": "badge-prime",
+    "OSN+": "badge-osn",
+    "ChatGPT": "badge-chatgpt",
+    "YouTube Premium": "badge-youtube",
+    "Crunchyroll": "badge-crunchyroll",
+    "Canva Pro": "badge-canva",
+    "CapCut Pro": "badge-capcut"
+  };
+  return map[product] || "badge-default";
+}
+
+function getServiceIcon(product) {
+  const icons = {
+    "Netflix": "🎬", "Shahid": "📺", "IPTV": "📡",
+    "Disney+": "🏰", "Prime Video": "🎥", "OSN+": "🌟",
+    "ChatGPT": "🤖", "YouTube Premium": "▶️",
+    "Crunchyroll": "🍥", "Canva Pro": "🎨", "CapCut Pro": "✂️"
+  };
+  return icons[product] || "📦";
+}
+
+function render() {
+  $("list").innerHTML = "";
+  let t = 0, a = 0, e = 0, u = 0, rows = 0;
+
+  subs.sort((a, b) => {
+    if (a.request && !b.request) return -1;
+    if (!a.request && b.request) return 1;
+    return 0;
+  });
+
+  subs.forEach((s, idx) => {
+    let diff = calcDays(s.end);
+
+    let searchData = (
+      (s.name || "") + (s.phone || "") + (s.email || "") +
+      (s.profile || "") + (s.password || "") + (s.pin || "") +
+      (s.product || "") + (s.price || "")
+    ).toLowerCase();
+
+    if (searchText && !searchData.includes(searchText)) return;
+    if (currentFilter === "active" && diff < 0) return;
+    if (currentFilter === "expired" && diff >= 0) return;
+    if (currentFilter === "unpaid" && s.paid) return;
+    if (currentFilter === "request" && !s.request) return;
+
+    t++;
+    diff < 0 ? e++ : a++;
+    if (!s.paid) u++;
+    rows++;
+
+    let endDate = getDateFromEnd(s.end);
+    let endText = endDate ? endDate.toLocaleDateString("ar-DZ") : "-";
+
+    let rowClass = s.request ? "row-request" :
+      diff < 0 ? "row-expired" :
+      !s.paid ? "row-unpaid" :
+      diff <= 3 ? "row-warn" : "row-ok";
+
+    let daysPillClass = s.request ? "days-request" :
+      diff < 0 ? "days-expired" : diff <= 3 ? "days-warn" : "days-ok";
+
+    let daysText = s.request ? "📋 طلب" : diff < 0 ? "منتهي" : diff + " يوم";
+
+    let tr = document.createElement("tr");
+    tr.className = rowClass;
+
+    // Escape values for inline onclick
+    const esc = v => (v || "").replace(/'/g, "\\'").replace(/"/g, "&quot;");
+
+    tr.innerHTML = `
+      <td class="num-cell">${rows}</td>
+      <td class="name-cell">
+        ${s.request ? '<span class="request-badge">📋 طلب</span> ' : ''}
+        ${s.name || "-"}
+      </td>
+      <td class="mono">${s.phone || "-"}</td>
+      <td class="mono" style="font-size:11px">${s.email || "-"}</td>
+      <td class="mono">${s.profile || "-"}</td>
+      <td class="mono">${s.password || "-"}</td>
+      <td class="mono">${s.pin || "-"}</td>
+      <td>
+        <span class="service-badge ${getServiceBadgeClass(s.product)}">
+          ${getServiceIcon(s.product)} ${s.product || "-"}
+        </span>
+      </td>
+      <td class="price-val">${s.price ? s.price + " DA" : "-"}</td>
+      <td style="font-size:12px;color:var(--text2)">${endText}</td>
+      <td>
+        <span class="days-pill ${daysPillClass}">${daysText}</span>
+      </td>
+      <td>
+        <label class="paid-check">
+          <input type="checkbox" ${s.paid ? "checked" : ""} onchange="togglePaid('${s.id}',this.checked)">
+          <span class="paid-slider"></span>
+        </label>
+      </td>
+      <td class="actions">
+        ${s.request
+          ? `<button class="btn btn-purple" onclick="editSub('${s.id}')">🚀 تفعيل</button>`
+          : `<button class="btn btn-accent" onclick="sendWhatsApp('${esc(s.phone)}','${esc(s.name)}','${esc(s.product)}','${endText}',${diff})" title="إرسال واتساب">💬</button>
+             <button class="btn btn-success" onclick="editSub('${s.id}')" title="تعديل">✏️</button>
+             <button class="btn btn-warning" onclick="generatePDF('${s.id}')" title="فاتورة PDF">🧾</button>`
+        }
+        <button class="btn btn-danger" onclick="deleteSub('${s.id}')" title="حذف">🗑</button>
+      </td>
+    `;
+
+    $("list").appendChild(tr);
+  });
+
+  $("emptyState").style.display = rows === 0 ? "block" : "none";
+  $("rowCount").textContent = `${rows} نتيجة`;
+  $("stTotal").textContent = t;
+  $("stActive").textContent = a;
+  $("stExpired").textContent = e;
+  $("stUnpaid").textContent = u;
+}
+
+// ========== UI UTILS ==========
+function toggleAddPanel(el) {
+  el.classList.toggle("open");
+  el.nextElementSibling.classList.toggle("open");
+}
+
+function showToast(msg, type = 'info') {
+  let toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  toast.innerHTML = msg;
+  $("toastContainer").appendChild(toast);
+  setTimeout(() => {
+    toast.style.animation = "toastOut 0.3s ease forwards";
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+// Close modal on overlay click
+$("editModal").addEventListener("click", function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+</body>
+</html>
